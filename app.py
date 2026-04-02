@@ -22,6 +22,16 @@ st.markdown("""
     .stSpinner {display: none !important;}
     #MainMenu {visibility: hidden;}
     
+    /* 2. Sembunyikan Tombol 'Hosted with Streamlit' di pojok kanan bawah */
+    .viewerBadge_container__1QSob,
+    .viewerBadge_link__3S86J,
+    div[data-testid="stStatusWidget"],
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
     /* 2. Style Form Login Agar Rapih */
     [data-testid="column"] { display: flex; align-items: flex-end; }
     
