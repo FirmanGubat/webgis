@@ -12,36 +12,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. CSS CUSTOM (ULTRACLEAN - NO BRANDING) ---
+# --- 2. CSS CUSTOM (TOTAL CLEAN - ANTI BRANDING) ---
 st.markdown("""
     <style>
-    /* 1. Sembunyikan Header, Footer, dan Menu Bawaan */
+    /* 1. Menghilangkan Header, Footer, dan Menu Bawaan */
     header {visibility: hidden; display: none !important;}
     footer {visibility: hidden; display: none !important;}
     #MainMenu {visibility: hidden; display: none !important;}
     
-    /* 2. Sembunyikan Status 'Running...' dan Spinner */
+    /* 2. Menghilangkan Status 'Running...' dan Spinner */
     div[data-testid="stStatusWidget"] {display: none !important;}
     .stSpinner {display: none !important;}
 
-    /* 3. PAKSA SEMBUNYIKAN BADGE KANAN BAWAH (Hosted with Streamlit) */
-    /* Menargetkan semua div yang mengandung class viewerBadge */
-    div[class*="viewerBadge"] {display: none !important;}
+    /* 3. MENGHILANGKAN BADGE 'HOSTED WITH STREAMLIT' (BRUTAL MODE) */
+    /* Menghilangkan container badge berdasarkan awalan class (gzau3 adalah dinamis) */
+    [class*="viewerBadge"] {display: none !important;}
+    [class*="profileContainer"] {display: none !important;}
     
-    /* Menargetkan tombol bantuan '?' di kanan bawah */
-    button[title="View source code"], 
-    button[title="Watch for changes"], 
-    button[aria-label="Help"] {
-        display: none !important;
-    }
+    /* Menghilangkan link dan elemen di dalam pojok kanan bawah secara spesifik */
+    a[href*="streamlit.io/cloud"] {display: none !important;}
+    div[class*="container"] > a[target="_blank"] {display: none !important;}
     
-    /* Menghilangkan tombol 'Deploy' di pojok kanan atas */
-    .stAppDeployButton {display: none !important;}
+    /* Menghilangkan tombol bantuan '?' dan menu aksi */
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDecoration"] {display: none !important;}
 
-    /* 4. Style Form Login Agar Rapih */
+    /* 4. Style Form Login Jabar (Tetap Seperti Sebelumnya) */
     [data-testid="column"] { display: flex; align-items: flex-end; }
-    
-    /* 5. Style Tombol Masuk Hijau Jabar */
     div.stButton > button {
         background-color: #539263 !important;
         color: white !important;
@@ -50,24 +47,15 @@ st.markdown("""
         border-radius: 8px !important;
         border: none !important;
         font-weight: bold;
-        transition: 0.3s;
     }
-    
-    /* Style saat tombol dilarang (disabled) */
     div.stButton > button:disabled {
         background-color: #d1d1d1 !important;
         color: #9e9e9e !important;
-        cursor: not-allowed;
     }
 
-    /* 6. Perbaikan Input Search di Sidebar agar menempel */
-    .sidebar-search div[data-baseweb="input"] {
-        border-radius: 8px 0px 0px 8px !important;
-    }
-    .sidebar-search-btn button {
-        border-radius: 0px 8px 8px 0px !important;
-        margin-left: -15px !important;
-    }
+    /* 5. Sidebar Search Fix */
+    .sidebar-search div[data-baseweb="input"] { border-radius: 8px 0px 0px 8px !important; }
+    .sidebar-search-btn button { border-radius: 0px 8px 8px 0px !important; margin-left: -15px !important; }
     </style>
     """, unsafe_allow_html=True)
 
