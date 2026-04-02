@@ -15,27 +15,23 @@ st.set_page_config(
 # --- 2. CSS CUSTOM (TOTAL CLEAN & JABAR STYLE) ---
 st.markdown("""
     <style>
-    /* 1. Sembunyikan SEMUA elemen loading bawaan Streamlit */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
+    /* 1. Sembunyikan SEMUA elemen branding Streamlit secara paksa */
+    header {visibility: hidden; display: none;}
+    footer {visibility: hidden; display: none;}
+    #MainMenu {visibility: hidden; display: none;}
     div[data-testid="stStatusWidget"] {display: none !important;}
     .stSpinner {display: none !important;}
-    #MainMenu {visibility: hidden;}
-    
-    /* 2. Sembunyikan Tombol 'Hosted with Streamlit' di pojok kanan bawah */
-    .viewerBadge_container__1QSob,
-    .viewerBadge_link__3S86J,
-    div[data-testid="stStatusWidget"],
-    [data-testid="stToolbar"],
-    [data-testid="stDecoration"] {
-        display: none !important;
-        visibility: hidden !important;
-    }
 
-    /* 2. Style Form Login Agar Rapih */
+    /* 2. Menghilangkan Badge "Hosted with Streamlit" (Pojok Kanan Bawah) */
+    /* Kita gunakan wildcard agar semua class yang mengandung 'viewerBadge' hilang */
+    div[class*="viewerBadge"] {display: none !important;}
+    div[class*="stAppDeployButton"] {display: none !important;}
+    div[data-testid="stToolbar"] {display: none !important;}
+
+    /* 3. Style Form Login Agar Rapih */
     [data-testid="column"] { display: flex; align-items: flex-end; }
     
-    /* 3. Style Tombol Masuk Hijau Jabar */
+    /* 4. Style Tombol Masuk Hijau Jabar */
     div.stButton > button {
         background-color: #539263 !important;
         color: white !important;
@@ -54,7 +50,7 @@ st.markdown("""
         cursor: not-allowed;
     }
 
-    /* 4. Perbaikan Input Search di Sidebar agar menempel */
+    /* 5. Perbaikan Input Search di Sidebar agar menempel */
     .sidebar-search div[data-baseweb="input"] {
         border-radius: 8px 0px 0px 8px !important;
     }
@@ -62,17 +58,6 @@ st.markdown("""
         border-radius: 0px 8px 8px 0px !important;
         margin-left: -15px !important;
     }
-
-    /* Menghilangkan footer 'Hosted with Streamlit' */
-    footer {visibility: hidden;}
-    
-    /* Menghilangkan garis dekorasi di bagian atas halaman */
-    header {visibility: hidden;}
-    
-    /* Menghilangkan tombol bantuan (?) di kanan bawah */
-    #MainMenu {visibility: hidden;}
-    [data-testid="stStatusWidget"] {display: none !important;}
-    </style>
     </style>
     """, unsafe_allow_html=True)
 
