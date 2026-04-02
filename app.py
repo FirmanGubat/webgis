@@ -1,74 +1,152 @@
 import streamlit as st
 import leafmap.foliumap as leafmap
+import requests
+import time
+from streamlit_gsheets import GSheetsConnection
 
-# 1. Konfigurasi Halaman (Harus di paling atas)
+# --- 1. KONFIGURASI HALAMAN ---
 st.set_page_config(
-    page_title="Custom WebGIS - Satu Peta Style",
-    page_icon="🌐",
+    page_title="WebGIS Jabar - Official Style",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS untuk mempercantik tampilan (Opsional tapi disarankan)
+# --- 2. CSS CUSTOM (TOTAL CLEAN & JABAR STYLE) ---
 st.markdown("""
     <style>
-    /* Menghilangkan padding atas agar peta lebih full */
-    .block-container {
-        padding-top: 1rem;
-        padding-bottom: 0rem;
+    /* 1. Sembunyikan SEMUA elemen loading bawaan Streamlit */
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    div[data-testid="stStatusWidget"] {display: none !important;}
+    .stSpinner {display: none !important;}
+    #MainMenu {visibility: hidden;}
+    
+    /* 2. Style Form Login Agar Rapih */
+    [data-testid="column"] { display: flex; align-items: flex-end; }
+    
+    /* 3. Style Tombol Masuk Hijau Jabar */
+    div.stButton > button {
+        background-color: #539263 !important;
+        color: white !important;
+        height: 3.5rem;
+        width: 100%;
+        border-radius: 8px !important;
+        border: none !important;
+        font-weight: bold;
+        transition: 0.3s;
     }
-    /* Mengatur style sidebar */
-    section[data-testid="stSidebar"] {
-        background-color: #f8f9fa;
-        border-right: 1px solid #e0e0e0;
+    
+    /* Style saat tombol dilarang (disabled) */
+    div.stButton > button:disabled {
+        background-color: #d1d1d1 !important;
+        color: #9e9e9e !important;
+        cursor: not-allowed;
+    }
+
+    /* 4. Perbaikan Input Search di Sidebar agar menempel */
+    .sidebar-search div[data-baseweb="input"] {
+        border-radius: 8px 0px 0px 8px !important;
+    }
+    .sidebar-search-btn button {
+        border-radius: 0px 8px 8px 0px !important;
+        margin-left: -15px !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR (Panel Kiri) ---
+# --- 3. KONEKSI DATA ---
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+def check_login(username, password):
+    try:
+        # Panggil data tanpa memicu spinner global
+        df = conn.read(worksheet="akun", ttl=0)
+        df.columns = df.columns.str.strip().str.lower()
+        user_match = df[(df['username'].astype(str) == str(username).strip()) & 
+                        (df['password'].astype(str) == str(password).strip())]
+        if not user_match.empty:
+            return user_match.iloc[0]['name']
+    except:
+        pass
+    return None
+
+# --- 4. LOGIKA LOGIN ---
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+    st.markdown("<br><br><h2 style='text-align: center;'>🔐 Login WebGIS</h2>", unsafe_allow_html=True)
+    
+    _, col_login, _ = st.columns([1, 1.2, 1])
+    with col_login:
+        user_in = st.text_input("Username", placeholder="Masukkan Username Anda!")
+        pass_in = st.text_input("Password", type="password", placeholder="••••••••")
+        
+        # Cek apakah field sudah diisi
+        is_ready = user_in and pass_in
+        
+        # Tombol Masuk
+        if st.button("Masuk", disabled=not is_ready, use_container_width=True):
+            # Animasi custom: Kita gunakan placeholder untuk pesan loading manual
+            msg_slot = st.empty()
+            msg_slot.info("Processing...") 
+            
+            time.sleep(1.2) # Simulasi loading
+            full_name = check_login(user_in, pass_in)
+            
+            if full_name:
+                msg_slot.success(f"Berhasil! Selamat datang {full_name}")
+                time.sleep(0.8)
+                st.session_state.logged_in = True
+                st.session_state.user_name = full_name
+                st.rerun()
+            else:
+                msg_slot.error("Username atau Password salah!")
+    st.stop()
+
+# --- 5. HALAMAN WEBGIS ---
+def get_arcgis_suggestions(text):
+    if not text or len(text) < 3: return []
+    url = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates"
+    params = {"f": "json", "singleLine": text, "maxLocations": 5, "outFields": "Match_addr", "location": "107.6191,-6.9175"}
+    try:
+        return requests.get(url, params=params).json().get("candidates", [])
+    except: return []
+
 with st.sidebar:
-    st.image("https://satupeta.jabarprov.go.id/static/img/logo-satu-peta.png", width=200) # Contoh logo
-    st.title("Pencarian")
-    search_location = st.text_input("Cari Lokasi", placeholder="Contoh: Bandung")
-    
+    st.write(f"👤 User: **{st.session_state.user_name}**")
+    if st.button("Logout"):
+        st.session_state.logged_in = False
+        st.rerun()
     st.divider()
+    st.image("https://satupeta.jabarprov.go.id/static/img/logo-satu-peta.png", width=180)
     
-    st.subheader("📁 Mapset")
-    with st.expander("Pilih Mapset", expanded=True):
-        st.info("Belum ada mapset yang dipilih. Silakan pilih layer di bawah.")
-        layer_tipe = st.multiselect(
-            "Layer Data Spasial",
-            ["Batas Administrasi", "Jaringan Jalan", "Tutupan Lahan", "Kawasan Hutan"],
-            default=["Batas Administrasi"]
-        )
-    
-    st.divider()
-    
-    st.subheader("📏 Pengukuran Peta")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.button("📍")
-    with col2:
-        st.button("📏")
-    with col3:
-        st.button("⬜")
+    st.subheader("🔍 Cari Lokasi")
+    col_in, col_bt = st.columns([4, 1])
+    with col_in:
+        st.markdown('<div class="sidebar-search">', unsafe_allow_html=True)
+        query = st.text_input("Cari", placeholder="Cari Lokasi...", label_visibility="collapsed")
+        st.markdown('</div>', unsafe_allow_html=True)
+    with col_bt:
+        st.markdown('<div class="sidebar-search-btn">', unsafe_allow_html=True)
+        st.button("🔍", key="search_btn")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-# --- KONTEN UTAMA (Peta) ---
-# Inisialisasi peta dengan koordinat Jawa Barat sebagai pusat
-m = leafmap.Map(
-    center=[-6.9175, 107.6191], 
-    zoom=9, 
-    google_map="HYBRID", # Bisa diganti sesuai kebutuhan
-    draw_export=True,
-    locate_control=True
-)
+    selected_coords = None
+    if query:
+        candidates = get_arcgis_suggestions(query)
+        if candidates:
+            st.markdown(f"**Lokasi ({len(candidates)})**")
+            addr_map = {c['address']: c['location'] for c in candidates}
+            choice = st.selectbox("Saran", options=list(addr_map.keys()), index=None, label_visibility="collapsed")
+            if choice: selected_coords = addr_map[choice]
 
-# Tambahkan fitur-fitur interaktif yang ada di referensi
+m = leafmap.Map(center=[-6.9175, 107.6191], zoom=10, draw_export=True, locate_control=True)
 m.add_basemap("OpenStreetMap")
-m.add_layer_control()
 
-# Menampilkan peta memenuhi layar
+if selected_coords:
+    lat, lon = selected_coords['y'], selected_coords['x']
+    m.set_center(lon, lat, zoom=15)
+    m.add_marker([lat, lon], tooltip=query)
+
 m.to_streamlit(height=750)
-
-# Footer atau Informasi tambahan di bawah peta (Opsional)
-st.caption("Koordinat: -6.9175, 107.6191 | Skala 1:30.000")
