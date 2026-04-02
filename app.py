@@ -52,6 +52,17 @@ st.markdown("""
         border-radius: 0px 8px 8px 0px !important;
         margin-left: -15px !important;
     }
+
+    /* Menghilangkan footer 'Hosted with Streamlit' */
+    footer {visibility: hidden;}
+    
+    /* Menghilangkan garis dekorasi di bagian atas halaman */
+    header {visibility: hidden;}
+    
+    /* Menghilangkan tombol bantuan (?) di kanan bawah */
+    #MainMenu {visibility: hidden;}
+    [data-testid="stStatusWidget"] {display: none !important;}
+    </style>
     </style>
     """, unsafe_allow_html=True)
 
@@ -63,11 +74,11 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    st.markdown("<br><br><h2 style='text-align: center;'>🔐 Login Satu Peta Jabar</h2>", unsafe_allow_html=True)
+    st.markdown("<br><br><h2 style='text-align: center;'>🔐 Login WebGIS</h2>", unsafe_allow_html=True)
     
     _, col_login, _ = st.columns([1, 1.2, 1])
     with col_login:
-        user_in = st.text_input("Username", placeholder="admin")
+        user_in = st.text_input("Username", placeholder="Masukkan Username Anda")
         pass_in = st.text_input("Password", type="password", placeholder="••••••••")
         
         # Aktifkan tombol jika field terisi
@@ -76,7 +87,7 @@ if not st.session_state.logged_in:
         if st.button("Masuk", disabled=not ready, use_container_width=True):
             # Placeholder untuk animasi loading manual (menghindari 'Running' widget)
             msg_slot = st.empty()
-            msg_slot.info("Memverifikasi...")
+            msg_slot.info("Sedang Melakukan Verifikasi...")
             
             time.sleep(1.2) # Animasi reload/wait
             
@@ -138,4 +149,6 @@ if selected_coords:
     m.set_center(lon, lat, zoom=15)
     m.add_marker([lat, lon], tooltip=query)
 
-m.to_streamlit(height=750)
+st.title(f"Selamat Datang, {st.session_state.user_name}")
+m = leafmap.Map(center=[-6.9175, 107.6191], zoom=9)
+m.to_streamlit(height=700)
