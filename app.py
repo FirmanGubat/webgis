@@ -12,32 +12,31 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. CSS CUSTOM (TOTAL CLEAN - ANTI BRANDING) ---
+# --- 2. CSS CUSTOM (TOTAL CLEAN - FINAL SOLUTION) ---
 st.markdown("""
     <style>
-    /* 1. Menghilangkan Header, Footer, dan Menu Bawaan */
+    /* 1. Sembunyikan Elemen UI Standar */
     header {visibility: hidden; display: none !important;}
     footer {visibility: hidden; display: none !important;}
     #MainMenu {visibility: hidden; display: none !important;}
-    
-    /* 2. Menghilangkan Status 'Running...' dan Spinner */
     div[data-testid="stStatusWidget"] {display: none !important;}
     .stSpinner {display: none !important;}
 
-    /* 3. MENGHILANGKAN BADGE 'HOSTED WITH STREAMLIT' (BRUTAL MODE) */
-    /* Menghilangkan container badge berdasarkan awalan class (gzau3 adalah dinamis) */
+    /* 2. MENGHILANGKAN BADGE 'HOSTED WITH STREAMLIT' & PROFILE (POJOK KANAN BAWAH) */
+    /* Targetkan berdasarkan link tujuan (Paling Ampuh) */
+    a[href*="streamlit.io/cloud"] {display: none !important;}
+    
+    /* Targetkan semua elemen yang memiliki class viewerBadge dan profile */
     [class*="viewerBadge"] {display: none !important;}
     [class*="profileContainer"] {display: none !important;}
+    [class*="profilePreview"] {display: none !important;}
     
-    /* Menghilangkan link dan elemen di dalam pojok kanan bawah secara spesifik */
-    a[href*="streamlit.io/cloud"] {display: none !important;}
-    div[class*="container"] > a[target="_blank"] {display: none !important;}
-    
-    /* Menghilangkan tombol bantuan '?' dan menu aksi */
+    /* Targetkan tombol bantuan '?' dan toolbar */
     [data-testid="stToolbar"] {display: none !important;}
-    [data-testid="stDecoration"] {display: none !important;}
+    button[title="View source code"] {display: none !important;}
+    button[aria-label="Help"] {display: none !important;}
 
-    /* 4. Style Form Login Jabar (Tetap Seperti Sebelumnya) */
+    /* 3. Style Form Login Jabar */
     [data-testid="column"] { display: flex; align-items: flex-end; }
     div.stButton > button {
         background-color: #539263 !important;
@@ -53,7 +52,7 @@ st.markdown("""
         color: #9e9e9e !important;
     }
 
-    /* 5. Sidebar Search Fix */
+    /* 4. Sidebar Search Fix */
     .sidebar-search div[data-baseweb="input"] { border-radius: 8px 0px 0px 8px !important; }
     .sidebar-search-btn button { border-radius: 0px 8px 8px 0px !important; margin-left: -15px !important; }
     </style>
