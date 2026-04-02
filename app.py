@@ -3,6 +3,7 @@ import leafmap.foliumap as leafmap
 import requests
 import time
 from streamlit_gsheets import GSheetsConnection
+from function.func import check_login
 
 # --- 1. KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -54,45 +55,33 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. KONEKSI DATA ---
+# --- 3. INISIALISASI KONEKSI ---
 conn = st.connection("gsheets", type=GSheetsConnection)
-
-def check_login(username, password):
-    try:
-        # Panggil data tanpa memicu spinner global
-        df = conn.read(worksheet="akun", ttl=0)
-        df.columns = df.columns.str.strip().str.lower()
-        user_match = df[(df['username'].astype(str) == str(username).strip()) & 
-                        (df['password'].astype(str) == str(password).strip())]
-        if not user_match.empty:
-            return user_match.iloc[0]['name']
-    except:
-        pass
-    return None
 
 # --- 4. LOGIKA LOGIN ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    st.markdown("<br><br><h2 style='text-align: center;'>🔐 Login WebGIS</h2>", unsafe_allow_html=True)
+    st.markdown("<br><br><h2 style='text-align: center;'>🔐 Login Satu Peta Jabar</h2>", unsafe_allow_html=True)
     
     _, col_login, _ = st.columns([1, 1.2, 1])
     with col_login:
-        user_in = st.text_input("Username", placeholder="Masukkan Username Anda!")
+        user_in = st.text_input("Username", placeholder="admin")
         pass_in = st.text_input("Password", type="password", placeholder="••••••••")
         
-        # Cek apakah field sudah diisi
-        is_ready = user_in and pass_in
+        # Aktifkan tombol jika field terisi
+        ready = user_in and pass_in
         
-        # Tombol Masuk
-        if st.button("Masuk", disabled=not is_ready, use_container_width=True):
-            # Animasi custom: Kita gunakan placeholder untuk pesan loading manual
+        if st.button("Masuk", disabled=not ready, use_container_width=True):
+            # Placeholder untuk animasi loading manual (menghindari 'Running' widget)
             msg_slot = st.empty()
-            msg_slot.info("Processing...") 
+            msg_slot.info("Memverifikasi...")
             
-            time.sleep(1.2) # Simulasi loading
-            full_name = check_login(user_in, pass_in)
+            time.sleep(1.2) # Animasi reload/wait
+            
+            # Panggil fungsi dari func.py dengan mengirimkan objek 'conn'
+            full_name = check_login(conn, user_in, pass_in)
             
             if full_name:
                 msg_slot.success(f"Berhasil! Selamat datang {full_name}")
