@@ -12,29 +12,40 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. CSS CUSTOM (TOTAL CLEAN - FINAL SOLUTION) ---
+# --- 2. CSS CUSTOM (ULTRACLEAN - ANTI-BRANDING FINAL) ---
 st.markdown("""
     <style>
-    /* 1. Sembunyikan Elemen UI Standar */
+    /* 1. Sembunyikan Elemen UI Standar Streamlit */
     header {visibility: hidden; display: none !important;}
     footer {visibility: hidden; display: none !important;}
     #MainMenu {visibility: hidden; display: none !important;}
     div[data-testid="stStatusWidget"] {display: none !important;}
     .stSpinner {display: none !important;}
 
-    /* 2. MENGHILANGKAN BADGE 'HOSTED WITH STREAMLIT' & PROFILE (POJOK KANAN BAWAH) */
-    /* Targetkan berdasarkan link tujuan (Paling Ampuh) */
+    /* 2. MENGHILANGKAN BADGE 'HOSTED WITH STREAMLIT' & PROFILE (BRUTAL MODE) */
+    /* Menghilangkan elemen berdasarkan link tujuan */
     a[href*="streamlit.io/cloud"] {display: none !important;}
     
-    /* Targetkan semua elemen yang memiliki class viewerBadge dan profile */
-    [class*="viewerBadge"] {display: none !important;}
-    [class*="profileContainer"] {display: none !important;}
-    [class*="profilePreview"] {display: none !important;}
-    
-    /* Targetkan tombol bantuan '?' dan toolbar */
-    [data-testid="stToolbar"] {display: none !important;}
-    button[title="View source code"] {display: none !important;}
-    button[aria-label="Help"] {display: none !important;}
+    /* Menghilangkan seluruh container yang mengandung badge dan profil di pojok kanan */
+    [class*="viewerBadge"], 
+    [class*="profileContainer"], 
+    [class*="profilePreview"],
+    [class*="managed-user-"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* Menghilangkan toolbar dan tombol bantuan */
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    button[title*="View source"],
+    button[aria-label*="Help"] {
+        display: none !important;
+    }
 
     /* 3. Style Form Login Jabar */
     [data-testid="column"] { display: flex; align-items: flex-end; }
